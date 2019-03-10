@@ -9,7 +9,7 @@ PORT_NUMBER = 17
 #the browser
 class HealthCheckHandler(BaseHTTPRequestHandler):
 
-    def check_supervisord_status(self):
+    def check_status(self):
         # supervisorctl status | awk '{ print $2 }' | sort | uniq | wc -l
         p = subprocess.Popen("/bin/true", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         retval = p.wait()
@@ -18,7 +18,7 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
 
 
     def do_healthcheck(self):
-        if self.check_supervisord_status():
+        if self.check_status():
             self.send_response(200)
             self.send_header('Content-type','text/html')
             self.end_headers()
