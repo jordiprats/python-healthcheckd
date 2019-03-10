@@ -1,3 +1,4 @@
+import logging
 import subprocess
 from ConfigParser import SafeConfigParser
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
@@ -46,18 +47,29 @@ if __name__ == "__main__":
     except IndexError:
         configfile = './healthcheckd.config'
 
-    with PidFile('healthcheckd') as pidfile:
-        logging.basicConfig(level=logging.DEBUG,
-                            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    try:
+        config = SafeConfigParser()
+        config.read(configfile)
+
         try:
-            #Create a web server and define the handler to manage the
-            #incoming request
-            server = HTTPServer(('', PORT_NUMBER), HealthCheckHandler)
-            print 'Started httpserver on port ' , PORT_NUMBER
+            pidfile = config.get('healthcheckd', 'pidfile').strip('"').strip("'").strip()
+        except:
+            pidfile = 'healthcheckd'
 
-            #Wait forever for incoming htto requests
-            server.serve_forever()
+        with PidFile(pidfile) as pidfile:
+            logging.basicConfig(level=logging.DEBUG,
+                                format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            try:
+                #Create a web server and define the handler to manage the
+                #incoming request
+                server = HTTPServer(('', PORT_NUMBER), HealthCheckHandler)
+                print 'Started httpserver on port ' , PORT_NUMBER
 
-        except KeyboardInterrupt:
-            print 'shutting down healthcheckd'
-            server.socket.close()
+                #Wait forever for incoming htto requests
+                server.serve_forever()
+
+            except KeyboardInterrupt:
+                logging.info('shutting down healthcheckd')
+                server.socket.close()
+    except:
+        logging.error('Error opening config file: '+configfile)
