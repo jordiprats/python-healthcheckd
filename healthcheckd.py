@@ -1,3 +1,4 @@
+import sys
 import logging
 import subprocess
 from ConfigParser import SafeConfigParser
@@ -72,4 +73,6 @@ if __name__ == "__main__":
                 logging.info('shutting down healthcheckd')
                 server.socket.close()
     except:
-        logging.error('Error opening config file: '+configfile)
+        msg = 'Error opening config file: '+configfile
+        logging.error(msg)
+        sys.exit(msg+'\n')
