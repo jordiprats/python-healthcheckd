@@ -69,7 +69,7 @@ if __name__ == "__main__":
                 #Create a web server and define the handler to manage the
                 #incoming request
                 server = HTTPServer(('', port_number), HealthCheckHandler)
-                print 'Started httpserver on port ' , port_number
+                print('Started httpserver on port '+str(port_number))
 
                 #Wait forever for incoming htto requests
                 server.serve_forever()
