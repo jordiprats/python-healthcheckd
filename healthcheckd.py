@@ -4,7 +4,6 @@ import subprocess
 from ConfigParser import SafeConfigParser
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 
-PORT_NUMBER = 17
 
 #This class will handles any incoming request from
 #the browser
@@ -16,7 +15,6 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
         retval = p.wait()
 
         return retval==0
-
 
     def do_healthcheck(self):
         if self.check_status():
@@ -57,13 +55,18 @@ if __name__ == "__main__":
         except:
             pidfile = 'healthcheckd'
 
+        try:
+            port_number = config.get('healthcheckd', 'port').strip('"').strip("'").strip()
+        except:
+            port_number = 17
+
         with PidFile(pidfile) as pidfile:
             logging.basicConfig(level=logging.DEBUG,
                                 format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
             try:
                 #Create a web server and define the handler to manage the
                 #incoming request
-                server = HTTPServer(('', PORT_NUMBER), HealthCheckHandler)
+                server = HTTPServer(('', port_number), HealthCheckHandler)
                 print 'Started httpserver on port ' , PORT_NUMBER
 
                 #Wait forever for incoming htto requests
