@@ -53,7 +53,7 @@ if __name__ == "__main__":
             pidfile = 'healthcheckd'
 
         try:
-            port_number = config.get('healthcheckd', 'port').strip('"').strip("'").strip()
+            port_number = int(config.get('healthcheckd', 'port').strip('"').strip("'").strip())
         except:
             port_number = 17
 
