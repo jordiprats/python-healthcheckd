@@ -63,7 +63,7 @@ if __name__ == "__main__":
             port_number = 17
 
         try:
-            command = config.get('healthcheckd', 'command').strip('"').strip("'").strip()
+            command = config.get('healthcheckd', 'command')
         except:
             command = '/bin/true'
 
