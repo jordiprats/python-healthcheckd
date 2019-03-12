@@ -77,7 +77,7 @@ if __name__ == "__main__":
                 logging.info('shutting down healthcheckd')
                 server.socket.close()
                 sys.exit()
-    except:
-        msg = 'Error opening config file: '+configfile
+    except Exception as e:
+        msg = 'Error opening config file: '+configfile+" # "+str(e)
         logging.error(msg)
         sys.exit(msg+'\n')
