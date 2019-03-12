@@ -53,6 +53,11 @@ if __name__ == "__main__":
             pidfile = 'healthcheckd'
 
         try:
+            piddir = config.get('healthcheckd', 'piddir').strip('"').strip("'").strip()
+        except:
+            piddir = 'healthcheckd'
+
+        try:
             port_number = int(config.get('healthcheckd', 'port').strip('"').strip("'").strip())
         except:
             port_number = 17
@@ -62,7 +67,7 @@ if __name__ == "__main__":
         except:
             command = '/bin/true'
 
-        with PidFile(pidfile) as pidfile:
+        with PidFile(piddir=piddir, pidname=pidfile) as pidfile:
             logging.basicConfig(level=logging.DEBUG,
                                 format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
             try:
