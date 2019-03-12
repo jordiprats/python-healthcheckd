@@ -1,6 +1,7 @@
 import sys
 import logging
 import subprocess
+from pid import PidFile
 from ConfigParser import SafeConfigParser
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 
