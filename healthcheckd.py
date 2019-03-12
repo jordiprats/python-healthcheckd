@@ -37,6 +37,24 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
         self.do_healthcheck()
         return
 
+def launch_server():
+    global port_number
+    logging.basicConfig(level=logging.DEBUG,
+                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    try:
+        #Create a web server and define the handler to manage the
+        #incoming request
+        server = HTTPServer(('', port_number), HealthCheckHandler)
+        print('Started httpserver on port '+str(port_number))
+
+        #Wait forever for incoming htto requests
+        server.serve_forever()
+
+    except KeyboardInterrupt:
+        logging.info('shutting down healthcheckd')
+        server.socket.close()
+        sys.exit()
+
 if __name__ == "__main__":
     try:
         configfile = sys.argv[1]
@@ -62,23 +80,13 @@ if __name__ == "__main__":
         except:
             command = '/bin/true'
 
-        with PidFile(pidfile) as pidfile:
-            logging.basicConfig(level=logging.DEBUG,
-                                format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-            try:
-                #Create a web server and define the handler to manage the
-                #incoming request
-                server = HTTPServer(('', port_number), HealthCheckHandler)
-                print('Started httpserver on port '+str(port_number))
+        if os.geteuid() != 0:
+            launch_server
+        else:
+            with PidFile(pidfile) as pidfile:
+                launch_server
 
-                #Wait forever for incoming htto requests
-                server.serve_forever()
-
-            except KeyboardInterrupt:
-                logging.info('shutting down healthcheckd')
-                server.socket.close()
-                sys.exit()
     except Exception as e:
-        msg = 'Error opening config file: '+configfile+" # "+str(e)
+        msg = 'Global ERROR: '+str(e)
         logging.error(msg)
         sys.exit(msg+'\n')
