@@ -10,10 +10,8 @@ from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 class HealthCheckHandler(BaseHTTPRequestHandler):
 
     def check_status(self):
-        # supervisorctl status | awk '{ print $2 }' | sort | uniq | wc -l
         p = subprocess.Popen("/bin/true", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         retval = p.wait()
-
         return retval==0
 
     def do_healthcheck(self):
@@ -75,6 +73,7 @@ if __name__ == "__main__":
             except KeyboardInterrupt:
                 logging.info('shutting down healthcheckd')
                 server.socket.close()
+                sys.exit()
     except:
         msg = 'Error opening config file: '+configfile
         logging.error(msg)
