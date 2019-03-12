@@ -11,8 +11,7 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
 
     def check_status(self):
         p = subprocess.Popen("/bin/true", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        retval = p.wait()
-        return retval==0
+        return p.wait()==0
 
     def do_healthcheck(self):
         if self.check_status():
