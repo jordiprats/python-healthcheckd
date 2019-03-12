@@ -10,7 +10,8 @@ from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 class HealthCheckHandler(BaseHTTPRequestHandler):
 
     def check_status(self):
-        p = subprocess.Popen("/bin/true", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        global command
+        p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         return p.wait()==0
 
     def do_healthcheck(self):
@@ -18,13 +19,11 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type','text/html')
             self.end_headers()
-            # Send the html message
             self.wfile.write("OK")
         else:
             self.send_response(503)
             self.send_header('Content-type','text/html')
             self.end_headers()
-            # Send the html message
             self.wfile.write("ERROR")
 
     #Handler for the GET requests
@@ -56,6 +55,11 @@ if __name__ == "__main__":
             port_number = config.get('healthcheckd', 'port').strip('"').strip("'").strip()
         except:
             port_number = 17
+
+        try:
+            command = config.get('healthcheckd', 'command').strip('"').strip("'").strip()
+        except:
+            command = '/bin/true'
 
         with PidFile(pidfile) as pidfile:
             logging.basicConfig(level=logging.DEBUG,
