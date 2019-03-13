@@ -4,6 +4,8 @@ This program is intended to be used by a load balancer that can only understand 
 
 If the command returns 0 it will answer with a HTTP/200, otherwise it will be an HTTP/503
 
+## usage
+
 ## configuration
 
 ```
