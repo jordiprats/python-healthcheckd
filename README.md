@@ -6,6 +6,12 @@ If the command returns 0 it will answer with a HTTP/200, otherwise it will be an
 
 ## usage
 
+Global healthcheckd section:
+* **piddir**: PID directory where to store pidfiles
+* **pidfile**: PID filename
+* **port**: Port to listen to
+* **command**: Command to execute to check for health status
+
 ## configuration
 
 ```

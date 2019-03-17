@@ -83,6 +83,7 @@ if __name__ == "__main__":
                 logging.info('shutting down healthcheckd')
                 server.socket.close()
                 sys.exit()
+
     except Exception as e:
         msg = 'Global ERROR: '+str(e)
         logging.error(msg)
