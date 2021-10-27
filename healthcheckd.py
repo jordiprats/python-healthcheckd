@@ -2,8 +2,8 @@ import sys
 import logging
 import subprocess
 from pid import PidFile
-from ConfigParser import SafeConfigParser
-from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
+from configparser import ConfigParser
+from http.server import BaseHTTPRequestHandler,HTTPServer
 
 
 #This class will handles any incoming request from
@@ -12,20 +12,22 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
 
     def check_status(self):
         global command
-        p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        return p.wait()==0
+        p = subprocess.Popen('bash -c \''+command+"'", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p.communicate()[0]
+        print(p.returncode)
+        return p.returncode==0
 
     def do_healthcheck(self):
         if self.check_status():
             self.send_response(200)
             self.send_header('Content-type','text/html')
             self.end_headers()
-            self.wfile.write("OK")
+            self.wfile.write(bytes("OK", "utf-8"))
         else:
             self.send_response(503)
             self.send_header('Content-type','text/html')
             self.end_headers()
-            self.wfile.write("ERROR")
+            self.wfile.write(bytes("ERROR", "utf-8"))
 
     #Handler for the GET requests
     def do_GET(self):
@@ -41,10 +43,10 @@ if __name__ == "__main__":
     try:
         configfile = sys.argv[1]
     except IndexError:
-        configfile = './healthcheckd.config'
+        configfile = '/etc/healthcheckd.config'
 
     try:
-        config = SafeConfigParser()
+        config = ConfigParser()
         config.read(configfile)
 
         try:
@@ -55,7 +57,7 @@ if __name__ == "__main__":
         try:
             piddir = config.get('healthcheckd', 'piddir').strip('"').strip("'").strip()
         except:
-            piddir = 'healthcheckd'
+            piddir = '/tmp'
 
         try:
             port_number = int(config.get('healthcheckd', 'port').strip('"').strip("'").strip())
@@ -63,9 +65,10 @@ if __name__ == "__main__":
             port_number = 17
 
         try:
-            command = config.get('healthcheckd', 'command')
-        except:
+            command = config.get('healthcheckd', 'command').strip('"').strip("'").strip()
+        except Exception as e:
             command = '/bin/true'
+            print('INFO: setting default command: '+command)
 
         with PidFile(piddir=piddir, pidname=pidfile) as pidfile:
             logging.basicConfig(level=logging.DEBUG,
